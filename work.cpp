@@ -132,6 +132,7 @@ void work_in_club(const std::string& file_name) {
 
                 if (client->table != -1) {
                     table[client->table].count += current - table[client->table].start;
+                    table[client->table].income += table[client->table].count.rounding() * price;
                     table[client->table].start.clear();
                     table[client->table].empty = true;
                 }
@@ -173,7 +174,9 @@ void work_in_club(const std::string& file_name) {
                 }
                 int old_table = client->table;
                 if (old_table != -1) {
-                    table[old_table].count += current - table[client->table].start;
+                    Time new_duration = current - table[old_table].start;
+                    table[old_table].count += new_duration;
+                    table[old_table].income += new_duration.rounding() * price;
                     if (!queue.empty()) {
                         table[old_table].name = queue.front();
                         queue.pop_front();
@@ -208,11 +211,13 @@ void work_in_club(const std::string& file_name) {
 
     for (int i = 0; i < num_of_comp; ++i) {
         if (!table[i].empty) {
-            table[i].count += end_time - table[i].start;
+            Time new_duration = end_time - table[i].start;
+            table[i].count += new_duration;
+            table[i].income += new_duration.rounding() * price;
             table[i].empty = true;
         }
-        std::cout << i + 1 << " " << price * table[i].count.rounding() << " " << table[i].count << "\n";
-        output << i + 1 << " " << price * table[i].count.rounding() << " " << table[i].count << "\n";
+        std::cout << i + 1 << " " << table[i].income << " " << table[i].count << "\n";
+        output << i + 1 << " " << table[i].income << " " << table[i].count << "\n";
     }
     output.close();
 }
